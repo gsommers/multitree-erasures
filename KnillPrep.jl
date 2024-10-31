@@ -5,9 +5,6 @@ using Base.Threads
 using QuantumClifford
 using StabilizerTree
 using SteanePrep
-using Utilities # sample_sites
-using CircuitOps # trace_layer!
-using TableauOps
 
 export prep_measurements_reset, prep_measurements, prep_state_knill, get_bell_idxs, prep_knill_reset
 

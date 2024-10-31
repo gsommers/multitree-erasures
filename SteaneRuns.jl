@@ -3,7 +3,6 @@ module SteaneRuns
 
 using Base.Threads
 using QuantumClifford
-using Utilities
 using StatsBase
 using StabilizerTree # for stabilizer and logical tableau (but I always just do Bell tree)
 using SteanePrep # lower-level state preparation functions
@@ -27,7 +26,7 @@ end
 
 # master function for version where I reset and feed back in
 # preparation of logical 0 or + state
-function steane_erasures_reset(gates, tmax, idxs, rates; log_state = "Z", init_pauli = "Z", num_samples::Int=1000, entropy_data = Dict{String,Any}("entropies"=>Dict(), "record"=>Dict()), measure_first::Int=1, fixed_n::Bool = true, subtree::Bool = false)
+function steane_erasures_reset(gates, tmax, idxs, rates; log_state = "Z", init_pauli = "Z", num_samples::Int=1000, entropy_data = Dict{String,Any}("entropies"=>Dict(), "record"=>Dict()), measure_first::Int=1, fixed_n::Bool = true)
     entropies = zeros(Int, tmax+1,num_samples, length(rates), length(idxs))
     records = zeros(Int, tmax-1,num_samples, length(rates), length(idxs))
     if haskey(entropy_data, "stab-basis")
@@ -35,23 +34,15 @@ function steane_erasures_reset(gates, tmax, idxs, rates; log_state = "Z", init_p
 	@assert entropy_data["log-basis"]==log_state
 	@assert entropy_data["first-meas"]==measure_first
 	@assert entropy_data["fixed-n"]==fixed_n
-	@assert entropy_data["subtree"]==subtree
     else
 	entropy_data["stab-basis"]=init_pauli
 	entropy_data["log-basis"]=log_state
 	entropy_data["first-meas"]=measure_first
 	entropy_data["fixed-n"] = fixed_n
-	entropy_data["subtree"] = subtree
     end
 
-    if subtree
-        clusters, input_sites = get_subtrees(tmax)
-    else
-        clusters = nothing
-	input_sites = nothing
-    end
     for idx_i=1:length(idxs)
-        steane_erasures_reset!(gates[idxs[idx_i]], tmax, rates, @view(entropies[:,:,:,idx_i]), @view(records[:,:,:,idx_i]); init_pauli = init_pauli, log_state = PAULIS[log_state][3], fixed_n = fixed_n, measure_first = measure_first, clusters = clusters, input_sites = input_sites)
+        steane_erasures_reset!(gates[idxs[idx_i]], tmax, rates, @view(entropies[:,:,:,idx_i]), @view(records[:,:,:,idx_i]); init_pauli = init_pauli, log_state = PAULIS[log_state][3], fixed_n = fixed_n, measure_first = measure_first)
     end
 
     # now turn into dictionary

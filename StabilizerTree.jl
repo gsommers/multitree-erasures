@@ -4,9 +4,6 @@
 module StabilizerTree
 
 using QuantumClifford
-using CircuitOps
-using TableauOps
-using PauliNoise
 
 #= Tracking operator spreading from root or fresh leaf =#
 export track_operator_spreading, track_fresh_stabilizers, track_stabilizer_generators, track_logical_reps, track_substabilizers
